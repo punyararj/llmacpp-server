@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  llamacpp-llama2:
+    image: llamacpp-server
+    container_name: llamacpp-llama2
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    volumes:
+      - ./models/llama-2-7b-chat.Q4_K_M.gguf:/app/models/llama-2-7b-chat.Q4_K_M.gguf
+      - ./app.llamacpp.json:/app/app.config
+    restart: always
+    ports:
+      - "8281:8080"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - llamacpp-net
+networks:
+  llamacpp-net:
+    driver: bridge
